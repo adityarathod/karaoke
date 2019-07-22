@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>SongVote</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:600,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://unpkg.com/vue-plyr/dist/vue-plyr.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<main id="app">
+		<div class="sv-header">
+			<div class="sv-head-title">SONGVOTE<span v-if="adminMode">&nbsp;ADMIN</span></div>
+		</div>
+		<div v-if="adminMode">
+			<div class="sv-songbox">
+				<div class="sv-addsong">PLAYER</div>
+			</div>
+			<section class="section">
+				<div class="container">
+					<vue-plyr max-width="40%" @player="beginPlayback">
+						<video>
+							<source v-bind:src="videoSource" type="video/mp4" size="480">
+						</video>
+					</vue-plyr>
+					<br>
+					<div class="field">
+						<div class="control has-text-centered">
+							<label class="checkbox">
+								<input type="checkbox" v-model="displayComputer">
+								Video display computer (will delete songs from list after play)
+							</label>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div>
+			<div class="sv-songbox">
+				<div class="sv-addsong">ADD SONG</div>
+			</div>
+			<section class="section" id="add">
+				<div class="container">
+					<div class="columns sv-form">
+						<div class="column">
+							<div class="field">
+								<label class="label sv-label">SONG NAME</label>
+								<div class="control">
+									<input class="input" type="text" v-model="songName">
+								</div>
+							</div>
+						</div>
+						<div class="column">
+							<div class="field">
+								<label class="label sv-label">YOUTUBE URL</label>
+								<div class="control">
+									<input class="input" type="url" placeholder="https://youtube.com/..."
+										v-model="songURL">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="has-text-centered">
+						<button class="button" @click="createNewSong"><strong>&#65291;
+								ADD</strong></button>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="sv-songbox">
+			<div class="sv-addsong">SONG QUEUE</div>
+		</div>
+		<section class="section">
+			<div class="container">
+				<div>
+					<div v-for="(song, idx) in songList" class="sv-songlist">
+						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%">
+							<a v-bind:href="song.url"
+								style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								<strong>{{ song.name }}</strong>
+							</a>
+							<div class="field is-grouped">
+								<p class="control"><button v-if="adminMode" class="button is-warning"
+										@click="removeSong(idx)">&#x2716;</button></p>
+								<p class="control">
+									<button class="button is-success" @click="upvoteSong(idx)">&#x25B2;
+										({{ song.votes }})</button>
+								</p>
+								<p class="control">
+									<button v-if="adminMode" class="button is-danger"
+										@click="downvoteSong(idx)">&#9660;</button>
+								</p>
+							</div>
+						</div>
+						<br>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="has-text-centered">
+			<span class="tag is-primary" @click="toggleAdminDialog" v-if="!adminMode">
+				Admin Mode</span>
+		</div>
+		<div class="has-text-centered" v-if="adminMode">
+			<span class="tag is-danger" @click="disableAdminMode">
+				Disable Admin Mode</span>
+		</div>
+		<div class="modal is-active" v-if="adminModeDialogActive">
+			<div class="modal-background" @click="toggleAdminDialog"></div>
+			<div class="modal-content">
+				<div class="box">
+					<h4 class="title is-4">
+						Enable Admin Mode
+					</h4>
+					<input type="password" class="input" v-model="password">
+					<br><br>
+					<p><em>This dialog will close automatically once the password is entered correctly.</em></p>
+				</div>
+			</div>
+			<button class="modal-close is-large" aria-label="close" @click="toggleAdminDialog"></button>
+		</div>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script type="text/javascript" src="https://unpkg.com/vue-plyr/dist/vue-plyr.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.3.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.3.0/firebase-database.js"></script>
+	<script src="firebase-init.js"></script>
+	<script src="https://cdn.rawgit.com/h2non/jsHashes/master/hashes.js"></script>
+	<script src="app.js"></script>
+
+</body>
+
+
+</html>
